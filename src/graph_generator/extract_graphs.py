@@ -69,14 +69,19 @@ def explore_files(
             monitoring.enter_file(file_path)
 
             # import pdb; pdb.set_trace()
-            if file_path[len(root_dir) :] not in files_to_extract:
-                continue
+            # if file_path[len(root_dir) :] not in files_to_extract:
+            #     continue
 
             graph = build_graph(f.read(), monitoring, type_lattice)
             if graph is None or len(graph["supernodes"]) == 0:
+                print("Failed to generate graph for file: ", file_path)
                 continue
             graph["filename"] = file_path[len(root_dir) :]
             yield graph
+    print("Errors found:")
+    for msgs in monitoring.errors:
+        for s in msgs:
+            print(s)
     type_lattice.build_graph()
 
 
@@ -102,7 +107,8 @@ def extract_graphs(root_dir, typing_rules_path, files_to_extract: Set[str], targ
     print("Building and saving the type graph...")
     type_lattice.build_graph()
     save_jsonl_gz(
-        [type_lattice.return_json()], os.path.join(target_folder, "_type_lattice.json.gz"),
+        [type_lattice.return_json()],
+        os.path.join(target_folder, "_type_lattice.json.gz"),
     )
 
     print("Done.")

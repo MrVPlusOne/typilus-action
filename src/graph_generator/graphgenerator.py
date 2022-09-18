@@ -425,12 +425,13 @@ class AstGraphGenerator(NodeVisitor):
             if (
                 child_symtable.get_type() == symtable_type
                 and child_symtable.get_name() == name
-                and (lineno is None or child_symtable.get_lineno() == lineno)
+                # and (lineno is None or child_symtable.get_lineno() == lineno)  # the line number sometimes doesn't match
             ):
                 self.__scope_symtable.append(child_symtable)
                 break
         else:
-            raise ValueError(
+            self.__scope_symtable.append(self.__scope_symtable[-1])
+            logging.warning(
                 f"Symbol Table for {name} of type {symtable_type} at {lineno} not found"
             )
 
